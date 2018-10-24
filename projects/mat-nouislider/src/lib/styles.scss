@@ -1,0 +1,314 @@
+.mat-nouislider-target,
+.mat-nouislider-target * {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-touch-callout: none;
+  box-sizing: border-box;
+  touch-action: none;
+  user-select: none;
+}
+
+.mat-nouislider-target {
+  direction: ltr;
+  position: relative;
+}
+
+.mat-nouislider-base,
+.mat-nouislider-connects {
+  height: 100%;
+  position: relative;
+  width: 100%;
+  z-index: 1;
+}
+
+/* Wrapper for all connect elements.
+  */
+.mat-nouislider-connects {
+  overflow: hidden;
+  z-index: 0;
+}
+
+.mat-nouislider-connect,
+.mat-nouislider-origin {
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  transform-origin: 0 0;
+  width: 100%;
+  will-change: transform;
+  z-index: 1;
+}
+
+/* Offset direction
+  */
+html:not([dir='rtl']) .mat-nouislider-horizontal .mat-nouislider-origin {
+  left: auto;
+  right: 0;
+}
+
+/* Give origins 0 height/width so they don't interfere with clicking the
+  * connect elements.
+  */
+.mat-nouislider-vertical .mat-nouislider-origin {
+  width: 0;
+}
+
+.mat-nouislider-horizontal .mat-nouislider-origin {
+  height: 0;
+}
+
+.mat-nouislider-handle {
+  position: absolute;
+}
+
+.mat-nouislider-state-tap .mat-nouislider-connect,
+.mat-nouislider-state-tap .mat-nouislider-origin {
+  transition: transform 0.3s;
+}
+
+.mat-nouislider-state-drag * {
+  cursor: inherit !important;
+}
+
+/* Slider size and handle placement;
+  */
+.mat-nouislider-horizontal {
+  height: 18px;
+}
+
+.mat-nouislider-horizontal .mat-nouislider-handle {
+  height: 28px;
+  left: -17px;
+  top: -6px;
+  width: 34px;
+}
+
+.mat-nouislider-vertical {
+  width: 18px;
+}
+
+.mat-nouislider-vertical .mat-nouislider-handle {
+  height: 34px;
+  left: -6px;
+  top: -17px;
+  width: 28px;
+}
+
+html:not([dir='rtl']) .mat-nouislider-horizontal .mat-nouislider-handle {
+  left: auto;
+  right: -17px;
+}
+
+/* Styling;
+  * Giving the connect element a border radius causes issues with using transform: scale
+  */
+.mat-nouislider-target {
+  background: #fafafa;
+  border-radius: 4px;
+  border: 1px solid #d3d3d3;
+  box-shadow: inset 0 1px 1px #f0f0f0, 0 3px 6px -5px #bbb;
+}
+
+.mat-nouislider-connects {
+  border-radius: 3px;
+}
+
+.mat-nouislider-connect {
+  background: #3fb8af;
+}
+
+/* Handles and cursors;
+  */
+.mat-nouislider-draggable {
+  cursor: ew-resize;
+}
+
+.mat-nouislider-vertical .mat-nouislider-draggable {
+  cursor: ns-resize;
+}
+
+.mat-nouislider-handle {
+  background: #fff;
+  border-radius: 3px;
+  border: 1px solid #d9d9d9;
+  box-shadow: inset 0 0 1px #fff, inset 0 1px 7px #ebebeb, 0 3px 6px -3px #bbb;
+  cursor: default;
+}
+
+.mat-nouislider-active {
+  box-shadow: inset 0 0 1px #fff, inset 0 1px 7px #ddd, 0 3px 6px -3px #bbb;
+}
+
+/* Handle stripes;
+  */
+.mat-nouislider-handle:before,
+.mat-nouislider-handle:after {
+  background: #e8e7e6;
+  content: '';
+  display: block;
+  height: 14px;
+  left: 14px;
+  position: absolute;
+  top: 6px;
+  width: 1px;
+}
+
+.mat-nouislider-handle:after {
+  left: 17px;
+}
+
+.mat-nouislider-vertical .mat-nouislider-handle:before,
+.mat-nouislider-vertical .mat-nouislider-handle:after {
+  height: 1px;
+  left: 6px;
+  top: 14px;
+  width: 14px;
+}
+
+.mat-nouislider-vertical .mat-nouislider-handle:after {
+  top: 17px;
+}
+
+/* Disabled state;
+  */
+[disabled] .mat-nouislider-connect {
+  background: #b8b8b8;
+}
+
+[disabled].mat-nouislider-target,
+[disabled].mat-nouislider-handle,
+[disabled] .mat-nouislider-handle {
+  cursor: not-allowed;
+}
+/* Base;
+  *
+  */
+.mat-nouislider-pips,
+.mat-nouislider-pips * {
+  box-sizing: border-box;
+}
+
+.mat-nouislider-pips {
+  color: #999;
+  position: absolute;
+}
+
+/* Values;
+  *
+  */
+.mat-nouislider-value {
+  position: absolute;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.mat-nouislider-value-sub {
+  color: #ccc;
+  font-size: 10px;
+}
+
+/* Markings;
+  *
+  */
+.mat-nouislider-marker {
+  background: #ccc;
+  position: absolute;
+}
+
+.mat-nouislider-marker-sub {
+  background: #aaa;
+}
+
+.mat-nouislider-marker-large {
+  background: #aaa;
+}
+
+/* Horizontal layout;
+  *
+  */
+.mat-nouislider-pips-horizontal {
+  height: 80px;
+  left: 0;
+  padding: 10px 0;
+  top: 100%;
+  width: 100%;
+}
+
+.mat-nouislider-value-horizontal {
+  transform: translate(-50%, 50%);
+}
+
+.mat-nouislider-rtl .mat-nouislider-value-horizontal {
+  transform: translate(50%, 50%);
+}
+
+.mat-nouislider-marker-horizontal.mat-nouislider-marker {
+  height: 5px;
+  margin-left: -1px;
+  width: 2px;
+}
+
+.mat-nouislider-marker-horizontal.mat-nouislider-marker-sub {
+  height: 10px;
+}
+
+.mat-nouislider-marker-horizontal.mat-nouislider-marker-large {
+  height: 15px;
+}
+
+/* Vertical layout;
+  *
+  */
+.mat-nouislider-pips-vertical {
+  height: 100%;
+  left: 100%;
+  padding: 0 10px;
+  top: 0;
+}
+
+.mat-nouislider-value-vertical {
+  padding-left: 25px;
+  transform: translate(0, -50%, 0);
+}
+
+.mat-nouislider-rtl .mat-nouislider-value-vertical {
+  transform: translate(0, 50%);
+}
+
+.mat-nouislider-marker-vertical.mat-nouislider-marker {
+  height: 2px;
+  margin-top: -1px;
+  width: 5px;
+}
+
+.mat-nouislider-marker-vertical.mat-nouislider-marker-sub {
+  width: 10px;
+}
+
+.mat-nouislider-marker-vertical.mat-nouislider-marker-large {
+  width: 15px;
+}
+
+.mat-nouislider-tooltip {
+  background: #fff;
+  border-radius: 3px;
+  border: 1px solid #d9d9d9;
+  color: #000;
+  display: block;
+  padding: 5px;
+  position: absolute;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.mat-nouislider-horizontal .mat-nouislider-tooltip {
+  bottom: 120%;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+
+.mat-nouislider-vertical .mat-nouislider-tooltip {
+  right: 120%;
+  top: 50%;
+  transform: translate(0, -50%);
+}

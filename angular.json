@@ -24,7 +24,7 @@
             ],
             "styles": [
               "src/styles.scss",
-              "dist/mat-nouislider/nouislider.css"
+              "dist/mat-nouislider/styles.scss"
             ],
             "scripts": []
           },

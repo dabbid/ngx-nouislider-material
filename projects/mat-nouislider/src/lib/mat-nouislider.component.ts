@@ -57,7 +57,7 @@ export class MatNouisliderComponent
   public slider: any;
   public handles: any[];
   @Input()
-  public disabled: boolean; // tslint:disable-line
+  public disabled: boolean;
   @Input()
   public behaviour: string;
   @Input()
@@ -114,6 +114,7 @@ export class MatNouisliderComponent
     const inputsConfig = JSON.parse(
       JSON.stringify({
         behaviour: this.behaviour,
+        cssPrefix: 'mat-nouislider-',
         connect: this.connect,
         limit: this.limit,
         start:

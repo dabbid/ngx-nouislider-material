@@ -8,7 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "build-lib": "ng build mat-nouislider && cp ./projects/mat-nouislider/node_modules/nouislider/distribute/nouislider.css ./dist/mat-nouislider/nouislider.css"
+    "build-lib": "ng build mat-nouislider && cp ./projects/mat-nouislider/src/lib/styles.scss ./dist/mat-nouislider/styles.scss"
   },
   "private": true,
   "dependencies": {
