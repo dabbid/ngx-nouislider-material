@@ -23,7 +23,8 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.scss",
+              "dist/mat-nouislider/nouislider.css"
             ],
             "scripts": []
           },
@@ -122,38 +123,38 @@
         }
       }
     },
-    "nouislider": {
-      "root": "projects/nouislider",
-      "sourceRoot": "projects/nouislider/src",
+    "mat-nouislider": {
+      "root": "projects/mat-nouislider",
+      "sourceRoot": "projects/mat-nouislider/src",
       "projectType": "library",
       "prefix": "mat",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-ng-packagr:build",
           "options": {
-            "tsConfig": "projects/nouislider/tsconfig.lib.json",
-            "project": "projects/nouislider/ng-package.json"
+            "tsConfig": "projects/mat-nouislider/tsconfig.lib.json",
+            "project": "projects/mat-nouislider/ng-package.json"
           },
           "configurations": {
             "production": {
-              "project": "projects/nouislider/ng-package.prod.json"
+              "project": "projects/mat-nouislider/ng-package.prod.json"
             }
           }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/nouislider/src/test.ts",
-            "tsConfig": "projects/nouislider/tsconfig.spec.json",
-            "karmaConfig": "projects/nouislider/karma.conf.js"
+            "main": "projects/mat-nouislider/src/test.ts",
+            "tsConfig": "projects/mat-nouislider/tsconfig.spec.json",
+            "karmaConfig": "projects/mat-nouislider/karma.conf.js"
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "projects/nouislider/tsconfig.lib.json",
-              "projects/nouislider/tsconfig.spec.json"
+              "projects/mat-nouislider/tsconfig.lib.json",
+              "projects/mat-nouislider/tsconfig.spec.json"
             ],
             "exclude": [
               "**/node_modules/**"
@@ -163,5 +164,10 @@
       }
     }
   },
-  "defaultProject": "ngx-nouislider-material-example"
+  "defaultProject": "ngx-nouislider-material-example",
+  "schematics": {
+    "@schematics/angular:component": {
+      "styleext": "scss"
+    }
+  }
 }

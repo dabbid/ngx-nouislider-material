@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NouisliderComponent } from './nouislider.component';
+import { MatNouisliderComponent } from './mat-nouislider.component';
 
-describe('NouisliderComponent', () => {
-  let component: NouisliderComponent;
-  let fixture: ComponentFixture<NouisliderComponent>;
+describe('MatNouisliderComponent', () => {
+  let component: MatNouisliderComponent;
+  let fixture: ComponentFixture<MatNouisliderComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ NouisliderComponent ]
+      declarations: [ MatNouisliderComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(NouisliderComponent);
+    fixture = TestBed.createComponent(MatNouisliderComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

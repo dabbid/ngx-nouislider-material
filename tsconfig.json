@@ -17,11 +17,11 @@
       "dom"
     ],
     "paths": {
-      "nouislider": [
-        "dist/nouislider"
+      "mat-nouislider": [
+        "dist/mat-nouislider"
       ],
-      "nouislider/*": [
-        "dist/nouislider/*"
+      "mat-nouislider/*": [
+        "dist/mat-nouislider/*"
       ]
     }
   }
