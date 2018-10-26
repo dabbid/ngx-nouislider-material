@@ -1,14 +1,16 @@
 import noUiSlider from 'nouislider';
 import {
   Component,
-  ElementRef,
   EventEmitter,
   forwardRef,
   Input,
   OnInit,
   OnChanges,
   Output,
-  Renderer2
+  Renderer2,
+  ViewChild,
+  OnDestroy,
+  SimpleChange
 } from '@angular/core';
 import {
   ControlValueAccessor,
@@ -16,31 +18,80 @@ import {
   NG_VALUE_ACCESSOR
 } from '@angular/forms';
 
-export interface NouiFormatter {
+export interface Formatter {
   to(value: number): string;
   from(value: string): number;
 }
 
-export class DefaultFormatter implements NouiFormatter {
-  to(value: number): string {
-    // formatting with http://stackoverflow.com/a/26463364/478584
-    return String(parseFloat(parseFloat(String(value)).toFixed(2)));
-  }
-
-  from(value: string): number {
-    return parseFloat(value);
-  }
+export interface Options {
+  animate?: boolean;
+  animationDuration?: number;
+  behaviour?: string;
+  connect?: boolean | boolean[];
+  cssPrefix?: string;
+  direction?: 'ltr' | 'rtl';
+  format?: Formatter;
+  keyboardSupport?: boolean;
+  limit?: number;
+  margin?: number;
+  orientation?: 'horizontal' | 'vertical';
+  padding?: number;
+  range: any;
+  snap?: boolean;
+  start: number | string | Array<number | string>;
+  step?: number;
+  tooltips?: boolean | Function | Array<boolean | Function>;
 }
+
+const UPDATABLE_OPTIONS = [
+  'animate',
+  'limit',
+  'margin',
+  'pips',
+  'range',
+  'snap',
+  'step'
+];
+
+const CSS_PREFIX = 'mat-nouislider-';
+
+const defaultOptions: Options = {
+  animate: true,
+  animationDuration: 300,
+  behaviour: 'tap',
+  connect: true,
+  cssPrefix: CSS_PREFIX,
+  direction: 'ltr',
+  format: {
+    to(value: number): string {
+      return String(parseFloat(parseFloat(String(value)).toFixed(2)));
+    },
+    from(value: string): number {
+      return parseFloat(value);
+    }
+  },
+  keyboardSupport: true,
+  limit: undefined,
+  margin: 0,
+  orientation: 'horizontal',
+  padding: 0,
+  range: undefined,
+  snap: false,
+  start: undefined,
+  step: undefined,
+  tooltips: false
+};
 
 @Component({
   selector: 'mat-nouislider',
-  template: '<div [attr.disabled]="disabled ? true : undefined"></div>',
+  template:
+    '<div #nativeSlider [attr.disabled]="disabled || (formControl && formControl.disabled)"></div>',
   styles: [
     `
       :host {
         display: block;
-        margin-top: 1rem;
-        margin-bottom: 1rem;
+        padding-bottom: 10px;
+        padding-top: 36px;
       }
     `
   ],
@@ -53,218 +104,215 @@ export class DefaultFormatter implements NouiFormatter {
   ]
 })
 export class MatNouisliderComponent
-  implements ControlValueAccessor, OnInit, OnChanges {
-  public slider: any;
-  public handles: any[];
+  implements ControlValueAccessor, OnInit, OnChanges, OnDestroy {
   @Input()
-  public disabled: boolean;
+  animate: boolean;
   @Input()
-  public behaviour: string;
+  animationDuration: number;
   @Input()
-  public connect: boolean[];
+  behaviour: string;
   @Input()
-  public limit: number;
+  connect: boolean | boolean[];
   @Input()
-  public min: number;
+  options: Options = null;
   @Input()
-  public max: number;
+  drection: 'ltr' | 'rtl';
   @Input()
-  public snap: boolean;
+  disabled: boolean;
   @Input()
-  public animate: boolean | boolean[];
+  formControl: FormControl;
   @Input()
-  public range: any;
+  format: Formatter;
   @Input()
-  public step: number;
+  keyboardSupport: boolean;
   @Input()
-  public format: NouiFormatter;
+  limit: number;
   @Input()
-  public pageSteps: number;
+  margin: number;
   @Input()
-  public config: any = {};
+  set max(n: number) {
+    this.range = { ...this.range, max: n };
+    this._max = n;
+  }
+
+  get max(): number {
+    return this._max;
+  }
   @Input()
-  public ngModel: number | number[];
+  set min(n: number) {
+    this.range = { ...this.range, min: n };
+    this._min = n;
+  }
+
+  get min(): number {
+    return this._min;
+  }
   @Input()
-  public keyboard: boolean;
+  ngModel: number | number[];
   @Input()
-  public onKeydown: any;
+  onKeydown: EventListenerOrEventListenerObject;
   @Input()
-  public formControl: FormControl;
+  orientation: 'horizontal' | 'vertical';
   @Input()
-  public tooltips: Array<any>;
+  padding: number;
+  @Input()
+  snap: boolean;
+  @Input()
+  step: number;
+  @Input()
+  tooltips: Array<any>;
+
   @Output()
-  public change: EventEmitter<any> = new EventEmitter(true);
+  change: EventEmitter<any> = new EventEmitter(true);
   @Output()
-  public update: EventEmitter<any> = new EventEmitter(true);
+  end: EventEmitter<any> = new EventEmitter(true);
   @Output()
-  public slide: EventEmitter<any> = new EventEmitter(true);
+  set: EventEmitter<any> = new EventEmitter(true);
   @Output()
-  public set: EventEmitter<any> = new EventEmitter(true);
+  slide: EventEmitter<any> = new EventEmitter(true);
   @Output()
-  public start: EventEmitter<any> = new EventEmitter(true);
+  start: EventEmitter<any> = new EventEmitter(true);
   @Output()
-  public end: EventEmitter<any> = new EventEmitter(true);
-  private value: any;
+  update: EventEmitter<any> = new EventEmitter(true);
+
+  @ViewChild('nativeSlider')
+  nativeSlider;
+
+  handles: HTMLElement[];
+  slider: any;
+
+  private _max: number;
+  private _min: number;
   private onChange: any = Function.prototype;
   private onTouched: any = Function.prototype;
+  private range: { min: number; max: number } = { min: 0, max: 0 };
+  private value: any;
 
-  constructor(private el: ElementRef, private renderer: Renderer2) {}
-
-  ngOnInit(): void {
-    const inputsConfig = JSON.parse(
-      JSON.stringify({
-        behaviour: this.behaviour,
-        cssPrefix: 'mat-nouislider-',
-        connect: this.connect,
-        limit: this.limit,
-        start:
-          this.formControl !== undefined
-            ? this.formControl.value
-            : this.ngModel,
-        step: this.step,
-        pageSteps: this.pageSteps,
-        keyboard: this.keyboard,
-        onKeydown: this.onKeydown,
-        range: this.range ||
-          this.config.range || { min: this.min, max: this.max },
-        tooltips: this.tooltips,
-        snap: this.snap,
-        animate: this.animate
-      })
-    );
-    inputsConfig.tooltips = this.tooltips || this.config.tooltips;
-    inputsConfig.format =
-      this.format || this.config.format || new DefaultFormatter();
-
-    this.slider = noUiSlider.create(
-      this.el.nativeElement.querySelector('div'),
-      Object.assign(this.config, inputsConfig)
-    );
-
-    this.handles = [].slice.call(
-      this.el.nativeElement.querySelectorAll('.noUi-handle')
-    );
-
-    if (this.config.keyboard) {
-      if (this.config.pageSteps === undefined) {
-        this.config.pageSteps = 10;
-      }
-      for (const handle of this.handles) {
-        handle.setAttribute('tabindex', 0);
-        handle.addEventListener('click', () => {
-          handle.focus();
-        });
-        if (this.config.onKeydown === undefined) {
-          handle.addEventListener('keydown', this.defaultKeyHandler);
-        } else {
-          handle.addEventListener('keydown', this.config.onKeydown);
-        }
-      }
-    }
-
-    this.slider.on(
-      'set',
-      (values: string[], handle: number) => {
-        this.eventHandler(this.set, values, handle);
-      }
-    );
-
-    this.slider.on(
-      'update',
-      (values: string[]) => {
-        this.update.emit(this.toValues(values));
-      }
-    );
-
-    this.slider.on(
-      'change',
-      (values: string[]) => {
-        this.change.emit(this.toValues(values));
-      }
-    );
-
-    this.slider.on(
-      'slide',
-      (values: string[], handle: number) => {
-        this.eventHandler(this.slide, values, handle);
-      }
-    );
-
-    this.slider.on(
-      'start',
-      (values: string[]) => {
-        this.start.emit(this.toValues(values));
-      }
-    );
-
-    this.slider.on(
-      'end',
-      (values: string[]) => {
-        this.end.emit(this.toValues(values));
-      }
-    );
+  constructor(private renderer: Renderer2) {
+    this.defaultKeyHandler = this.defaultKeyHandler.bind(this);
   }
 
-  ngOnChanges(changes: any) {
+  ngOnInit() {
+    this.slider = noUiSlider.create(
+      this.nativeSlider.nativeElement,
+      this.getOptions(true)
+    );
+    // enable keyboard handling
+    if (this.slider.options.keyboardSupport) {
+      this.handles = Array.from(
+        this.nativeSlider.nativeElement.querySelectorAll(`.${CSS_PREFIX}handle`)
+      );
+      this.handles.forEach((handle: HTMLElement, index: number) => {
+        handle.setAttribute('tabindex', String(index));
+        handle.addEventListener('click', this.onHandleClick);
+        if (this.onKeydown) {
+          handle.addEventListener('keydown', this.onKeydown);
+        } else {
+          handle.addEventListener('keydown', this.defaultKeyHandler);
+        }
+      });
+    }
+    // bind noui slider listeners to component's emitter
+    this.slider.on('set', (values: string[], handle: number) => {
+      this.eventHandler(this.set, values, handle);
+    });
+
+    this.slider.on('update', (values: string[]) => {
+      this.update.emit(this.toValues(values));
+    });
+
+    this.slider.on('change', (values: string[]) => {
+      this.change.emit(this.toValues(values));
+    });
+
+    this.slider.on('slide', (values: string[], handle: number) => {
+      this.eventHandler(this.slide, values, handle);
+    });
+
+    this.slider.on('start', (values: string[]) => {
+      this.start.emit(this.toValues(values));
+    });
+
+    this.slider.on('end', (values: string[]) => {
+      this.end.emit(this.toValues(values));
+    });
+  }
+
+  ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
+    // TODO: if other properties than 'updatable' ones have changed
+    // re instantiate noui slider with new options
+    // (get changed values, if one or more is not 'updatable', re instantiate, otherwise update options)
     if (
       this.slider &&
-      (changes.min || changes.max || changes.step || changes.range)
+      (Object.keys(changes).some((key: string) =>
+        UPDATABLE_OPTIONS.includes(key)
+      ) ||
+        changes.options)
     ) {
+      // setTimeout needed to prevent possible noui slider updates before ng changes are effective
       setTimeout(() => {
-        this.slider.updateOptions({
-          range: Object.assign(
-            {},
-            {
-              min: this.min,
-              max: this.max
-            },
-            this.range || {}
-          ),
-          step: this.step
-        });
+        this.slider.updateOptions(this.getOptions());
       });
     }
   }
 
-  toValues(values: string[]): any | any[] {
-    const v = values.map(this.config.format.from);
-    return v.length === 1 ? v[0] : v;
-  }
-
-  writeValue(value: any): void {
-    if (this.slider) {
-      setTimeout(() => {
-        this.slider.set(value);
+  ngOnDestroy() {
+    if (this.slider.options.keyboardSupport) {
+      this.handles.forEach((handle: HTMLElement) => {
+        handle.removeEventListener('click', this.onHandleClick);
+        if (typeof this.onKeydown !== undefined) {
+          handle.removeEventListener('keydown', this.onKeydown);
+        } else {
+          handle.removeEventListener('keydown', this.defaultKeyHandler);
+        }
       });
     }
+    this.slider.destroy();
   }
 
-  registerOnChange(fn: (value: any) => void) {
+  registerOnChange(fn: any) {
     this.onChange = fn;
   }
 
-  registerOnTouched(fn: () => {}): void {
+  registerOnTouched(fn: any) {
     this.onTouched = fn;
+  }
+
+  reset() {
+    if (this.slider) {
+      this.slider.reset();
+    }
   }
 
   setDisabledState(isDisabled: boolean): void {
     isDisabled
       ? this.renderer.setAttribute(
-          this.el.nativeElement.childNodes[0],
+          this.nativeSlider.nativeElement,
           'disabled',
           'true'
         )
       : this.renderer.removeAttribute(
-          this.el.nativeElement.childNodes[0],
+          this.nativeSlider.nativeElement,
           'disabled'
         );
   }
 
-  private eventHandler = (
+  toValues(values: string[]): any | any[] {
+    const v = values.map(this.slider.options.format.from);
+    return v.length === 1 ? v[0] : v;
+  }
+
+  writeValue(value: any): void {
+    if (this.slider) {
+      this.slider.set(value);
+    }
+  }
+
+  private eventHandler(
     emitter: EventEmitter<any>,
     values: string[],
     handle: number
-  ) => {
+  ) {
     const v = this.toValues(values);
     let emitEvents = false;
     if (this.value === undefined) {
@@ -286,20 +334,19 @@ export class MatNouisliderComponent
     } else {
       this.value = v;
     }
-  };
+  }
 
-  private defaultKeyHandler = (e: KeyboardEvent) => {
+  defaultKeyHandler(e: KeyboardEvent) {
     const stepSize: any[] = this.slider.steps();
-    const index = parseInt((<HTMLElement>e.target).getAttribute('data-handle'), 10);
+    const index = Number((e.target as HTMLElement).getAttribute('data-handle'));
     let sign = 1;
-    let multiplier = 1;
+    let factor = 1;
     let step = 0;
-    let delta = 0;
 
     switch (e.which) {
       case 34: // PageDown
-        multiplier = this.config.pageSteps;
-        break;
+        factor = 10;
+      // tslint:disable-next-line
       case 40: // ArrowDown
       case 37: // ArrowLeft
         sign = -1;
@@ -308,8 +355,8 @@ export class MatNouisliderComponent
         break;
 
       case 33: // PageUp
-        multiplier = this.config.pageSteps;
-        break;
+        factor = 10;
+      // tslint:disable-next-line
       case 38: // ArrowUp
       case 39: // ArrowRight
         step = stepSize[index][1];
@@ -320,16 +367,43 @@ export class MatNouisliderComponent
         break;
     }
 
-    delta = sign * multiplier * step;
-    let newValue: number | number[];
+    const delta = sign * factor * step;
 
+    let newValue: number | number[];
     if (Array.isArray(this.value)) {
-      newValue = [].concat(this.value);
+      newValue = [...this.value];
       newValue[index] = newValue[index] + delta;
     } else {
       newValue = this.value + delta;
     }
 
     this.slider.set(newValue);
+  }
+
+  private getOptions(isInitial = false) {
+    const options = Object.keys(defaultOptions).reduce(
+      (res: any, key: string): any => {
+        if (this[key] != null && !(this[key] instanceof EventEmitter)) {
+          res[key] = this[key];
+        }
+        return res;
+      },
+      {}
+    );
+    if (options.step && (!options.margin || options.margin < options.step)) {
+      // slider range handles shouldn't overlap each other (i.e. user shouldn't be abble to define range like [10, 10])
+      // so if step is defined, margin should at least equals step
+      options.margin = options.step;
+    }
+    if (isInitial) {
+      // only define 'start' option on init
+      options.start = this.formControl ? this.formControl.value : this.ngModel;
+      return { ...defaultOptions, ...options, ...this.options };
+    }
+    return { ...options, ...this.options };
+  }
+
+  private onHandleClick(e: Event) {
+    (e.currentTarget as HTMLElement).focus();
   }
 }
