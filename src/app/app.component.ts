@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,11 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  value = 0;
+
+  hasTooltip1 = true;
+  step1 = 1;
+  value1 = 50;
+  value2 = [30, 70];
+
+  constructor(private fb: FormBuilder) {}
 }

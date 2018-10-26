@@ -1,8 +1,37 @@
-<mat-nouislider
-  [min]="0"
-  [max]="100"
-  [step]="10"
-  [(ngModel)]="value"
-  (ngModelChange)="onChange($event)"
-  [disabled]="disabled"
-></mat-nouislider>
+<h1>ngx-nouislider-material</h1>
+<div class="examples">
+
+  <div class="update-options-example">
+    <h2>Simple</h2>
+    <mat-nouislider
+      [(ngModel)]="value1"
+      [connect]="[true, false]"
+      [max]="100"
+      [min]="0"
+      [step]="step1"
+      [tooltips]="hasTooltip1"
+    ></mat-nouislider>
+    <p class="value">Current value is <b>{{ value1 }}</b></p>
+    <h3>Slider options</h3>
+    <label for="step">Step</label>
+    <input [(ngModel)]="step1" id="step" max="10" min="1" type="number">
+    <br>
+    <label for="value">Value</label>
+    <input [(ngModel)]="value1" id="value" max="100" min="0" type="number">
+    <br>
+    <label for="tooltip">Tooltip</label>
+    <input [(ngModel)]="hasTooltip1" id="tooltip" type="checkbox">
+  </div>
+
+  <div class="range-example">
+      <h2>Range</h2>
+      <mat-nouislider
+        [(ngModel)]="value2"
+        [max]="100"
+        [min]="0"
+        [step]="1"
+        [tooltips]="[true, true]"
+      ></mat-nouislider>
+      <p class="value">Current range is from <b>{{ value2[0] }}</b> to <b>{{ value2[1] }}</b></p>
+    </div>
+</div>

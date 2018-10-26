@@ -1,0 +1,16 @@
+.examples {
+  margin: auto;
+  max-width: 400px;
+  width: 100%;
+
+  > div {
+    padding: 3rem 1rem 1rem;
+  }
+}
+
+.range-inputs {
+  display: flex;
+  justify-content: space-between;
+}
+
+.value {}
