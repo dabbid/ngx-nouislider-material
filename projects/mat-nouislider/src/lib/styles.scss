@@ -1,3 +1,24 @@
+$color-primary: #5536e7;
+$color-disabled: #8c8c8c;
+$handle-size: 36px;
+
+.mat-nouislider-target[disabled] {
+  pointer-events: none;
+
+  &::after {
+    background-color: rgba($color-disabled, .38);
+  }
+
+  .mat-nouislider-handle::after {
+    background-color: $color-disabled;
+    box-shadow: 0 0 0 3px #fff;
+    bottom: round($handle-size / 2.5);
+    left: round($handle-size / 2.5);
+    right: round($handle-size / 2.5);
+    top: round($handle-size / 2.5);
+  }
+}
+
 .mat-nouislider-target,
 .mat-nouislider-target * {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -57,10 +78,6 @@ html:not([dir='rtl']) .mat-nouislider-horizontal .mat-nouislider-origin {
   height: 0;
 }
 
-.mat-nouislider-handle {
-  position: absolute;
-}
-
 .mat-nouislider-state-tap .mat-nouislider-connect,
 .mat-nouislider-state-tap .mat-nouislider-origin {
   transition: transform 0.3s;
@@ -73,14 +90,21 @@ html:not([dir='rtl']) .mat-nouislider-horizontal .mat-nouislider-origin {
 /* Slider size and handle placement;
   */
 .mat-nouislider-horizontal {
-  height: 18px;
+  height: $handle-size;
+
+  &::after {
+    height: 2px;
+    left: 0;
+    right: 0;
+    top: $handle-size / 2;
+  }
 }
 
 .mat-nouislider-horizontal .mat-nouislider-handle {
-  height: 28px;
-  left: -17px;
-  top: -6px;
-  width: 34px;
+  height: $handle-size;
+  left: -($handle-size / 2);
+  top: 1px;
+  width: $handle-size;
 }
 
 .mat-nouislider-vertical {
@@ -96,25 +120,26 @@ html:not([dir='rtl']) .mat-nouislider-horizontal .mat-nouislider-origin {
 
 html:not([dir='rtl']) .mat-nouislider-horizontal .mat-nouislider-handle {
   left: auto;
-  right: -17px;
+  right: -($handle-size / 2);
 }
 
-/* Styling;
-  * Giving the connect element a border radius causes issues with using transform: scale
-  */
 .mat-nouislider-target {
-  background: #fafafa;
-  border-radius: 4px;
-  border: 1px solid #d3d3d3;
-  box-shadow: inset 0 1px 1px #f0f0f0, 0 3px 6px -5px #bbb;
-}
+  position: relative;
 
-.mat-nouislider-connects {
-  border-radius: 3px;
+  &::after {
+    background: rgba($color-primary, .38);
+    content: '';
+    position: absolute;
+  }
 }
 
 .mat-nouislider-connect {
-  background: #3fb8af;
+  background: $color-primary;
+}
+
+.mat-nouislider-horizontal .mat-nouislider-connect {
+  height: 2px;
+  top: $handle-size / 2;
 }
 
 /* Handles and cursors;
@@ -128,45 +153,51 @@ html:not([dir='rtl']) .mat-nouislider-horizontal .mat-nouislider-handle {
 }
 
 .mat-nouislider-handle {
-  background: #fff;
-  border-radius: 3px;
-  border: 1px solid #d9d9d9;
-  box-shadow: inset 0 0 1px #fff, inset 0 1px 7px #ebebeb, 0 3px 6px -3px #bbb;
-  cursor: default;
-}
-
-.mat-nouislider-active {
-  box-shadow: inset 0 0 1px #fff, inset 0 1px 7px #ddd, 0 3px 6px -3px #bbb;
-}
-
-/* Handle stripes;
-  */
-.mat-nouislider-handle:before,
-.mat-nouislider-handle:after {
-  background: #e8e7e6;
-  content: '';
-  display: block;
-  height: 14px;
-  left: 14px;
+  border-radius: 50%;
+  cursor: pointer;
   position: absolute;
-  top: 6px;
-  width: 1px;
-}
 
-.mat-nouislider-handle:after {
-  left: 17px;
-}
+  &::before {
+    background-color: transparent;
+    border-radius: 50%;
+    bottom: 0;
+    content: '';
+    display: block;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: all .3s cubic-bezier(0, .75, .5, 1);
+  }
 
-.mat-nouislider-vertical .mat-nouislider-handle:before,
-.mat-nouislider-vertical .mat-nouislider-handle:after {
-  height: 1px;
-  left: 6px;
-  top: 14px;
-  width: 14px;
-}
+  &::after {
+    background-color: $color-primary;
+    border-radius: 50%;
+    bottom: $handle-size / 3;
+    content: '';
+    display: block;
+    left: $handle-size / 3;
+    position: absolute;
+    right: $handle-size / 3;
+    top: $handle-size / 3;
+  }
 
-.mat-nouislider-vertical .mat-nouislider-handle:after {
-  top: 17px;
+  &:hover::before {
+    background-color: rgba($color-primary, .1);
+
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &.mat-nouislider-active::before {
+    background-color: rgba($color-primary, .2);
+    bottom: -7px;
+    left: -7px;
+    right: -7px;
+    top: -7px;
+  }
 }
 
 /* Disabled state;
@@ -290,25 +321,59 @@ html:not([dir='rtl']) .mat-nouislider-horizontal .mat-nouislider-handle {
 }
 
 .mat-nouislider-tooltip {
-  background: #fff;
-  border-radius: 3px;
-  border: 1px solid #d9d9d9;
-  color: #000;
-  display: block;
-  padding: 5px;
+  background-color: $color-primary;
+  border-radius: 50%;
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  height: 36px;
+  left: 0;
+  line-height: 36px;
+  opacity: 0;
   position: absolute;
   text-align: center;
+  top: -36px;
+  transform: scale(0) translateY(200%);
+  transition: opacity .15s cubic-bezier(0, .75, .5, 1), transform .15s cubic-bezier(0, .75, .5, 1);
   white-space: nowrap;
+  width: 36px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    border: 13px solid transparent;
+    border-top: 16px solid $color-primary;
+    transform: translateX(-50%);
+  }
 }
 
-.mat-nouislider-horizontal .mat-nouislider-tooltip {
-  bottom: 120%;
-  left: 50%;
-  transform: translate(-50%, 0);
+.mat-nouislider-active .mat-nouislider-tooltip {
+  opacity: 1;
+  transform: scale(1) translateY(0);
 }
 
-.mat-nouislider-vertical .mat-nouislider-tooltip {
-  right: 120%;
-  top: 50%;
-  transform: translate(0, -50%);
-}
+// .mat-nouislider-tooltip {
+//   background: #fff;
+//   border-radius: 3px;
+//   border: 1px solid #d9d9d9;
+//   color: #000;
+//   display: block;
+//   padding: 5px;
+//   position: absolute;
+//   text-align: center;
+//   white-space: nowrap;
+// }
+
+// .mat-nouislider-horizontal .mat-nouislider-tooltip {
+//   bottom: 120%;
+//   left: 50%;
+//   transform: translate(-50%, 0);
+// }
+
+// .mat-nouislider-vertical .mat-nouislider-tooltip {
+//   right: 120%;
+//   top: 50%;
+//   transform: translate(0, -50%);
+// }
