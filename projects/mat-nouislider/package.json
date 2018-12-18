@@ -1,6 +1,19 @@
 {
-  "name": "mat-nouislider",
+  "name": "ngx-nouislider-material",
   "version": "0.0.1",
+  "description": "An Angular 6 port of the vanilla JS noUiSlider lib (https://github.com/leongersen/noUiSlider), with a material flavor.",
+  "author": "David Daignan",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dabbid/ngx-nouislider-material.git"
+  },
+  "keywords": [
+    "angular",
+    "slider",
+    "range-slider",
+    "material"
+  ],
+  "license": "MIT",
   "peerDependencies": {
     "@angular/common": "^6.0.0-rc.0 || ^6.0.0",
     "@angular/core": "^6.0.0-rc.0 || ^6.0.0"
